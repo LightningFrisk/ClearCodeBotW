@@ -10,7 +10,7 @@ extends CharacterBody3D
 @onready var fall_gravity : float = ((-2.0 * jump_height) / (jump_time_to_descent * jump_time_to_descent)) * -1.0
 
 @export var base_speed := 4.0
-@export var run_speed := 8.0
+@export var run_speed := 6.0
 
 var movement_input := Vector2.ZERO
 
@@ -19,7 +19,6 @@ var movement_input := Vector2.ZERO
 func _physics_process(delta: float) -> void:
 	movement_logic(delta)
 	jump_logic(delta)
-	
 	move_and_slide()
 
 func jump_logic (delta) -> void:
@@ -32,14 +31,13 @@ func jump_logic (delta) -> void:
 func movement_logic (delta) -> void:
 	movement_input = Input.get_vector("left","right", "forward", "backward").rotated(-camera.global_rotation.y)
 	var vel_2d = Vector2(velocity.x, velocity.z)
+	var is_running: bool = Input.is_action_pressed("run")
 	
 	if movement_input != Vector2.ZERO:
-		if Input.is_action_pressed("run"):
-			vel_2d += movement_input * run_speed * delta
-			vel_2d = vel_2d.limit_length(run_speed)
-		else:
-			vel_2d += movement_input * base_speed * delta
-			vel_2d = vel_2d.limit_length(base_speed)
+		var speed = run_speed if is_running else base_speed
+		
+		vel_2d += movement_input * speed * delta
+		vel_2d = vel_2d.limit_length(speed)
 		velocity.x = vel_2d.x
 		velocity.z = vel_2d.y
 	else:
